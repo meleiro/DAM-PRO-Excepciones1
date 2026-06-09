@@ -1,373 +1,170 @@
-// Importamos las excepciones y clases necesarias
-import java.util.InputMismatchException;
-import java.util.Scanner;
+// ======================================================
+// EJEMPLO 8: EXCEPCIONES PERSONALIZADAS
+// ======================================================
+//
+// Este método permite demostrar el funcionamiento de:
+//
+// - Excepciones creadas por el programador.
+// - throw (lanzar una excepción).
+// - throws (declarar una excepción).
+// - Propagación de excepciones.
+// - Captura mediante múltiples bloques catch.
+//
+// El usuario debe introducir:
+//
+// 1. Nombre
+// 2. Edad
+// 3. Saldo disponible
+// 4. Cantidad a retirar
+//
+// Cada dato es validado por métodos independientes.
+// Si alguna validación falla, se lanza una excepción
+// personalizada que será capturada aquí.
+//
+public static void excepcionesPersonalizadas(Scanner sc) {
 
-// Clase principal del programa
-public class Main {
+    // Variable de control para repetir el proceso
+    // hasta que todos los datos sean correctos.
+    boolean correcto = false;
 
-    // Método principal: punto de entrada del programa
-    public static void main(String[] args) {
+    while (!correcto) {
 
-        // Creamos un Scanner para leer datos desde teclado
-        Scanner sc = new Scanner(System.in);
+        try {
 
-        // Variable que almacenará la opción elegida en el menú
-        int opcion;
+            // --------------------------------------------------
+            // LIMPIEZA DEL BUFFER
+            // --------------------------------------------------
+            //
+            // Cuando previamente hemos utilizado nextInt()
+            // o nextDouble(), queda pendiente un salto de línea.
+            //
+            // Si no lo eliminamos, el siguiente nextLine()
+            // leerá una cadena vacía automáticamente.
+            //
+            sc.nextLine();
 
-        // Bucle principal del menú
-        do {
+            // --------------------------------------------------
+            // LECTURA Y VALIDACIÓN DEL NOMBRE
+            // --------------------------------------------------
+            //
+            // Pedimos el nombre al usuario.
+            //
+            System.out.print("Introduce tu nombre: ");
 
-            // Mostramos las opciones disponibles
-            System.out.println("\n===== MENÚ EXCEPCIONES =====");
-            System.out.println("1. División por cero");
-            System.out.println("2. Letras en lugar de número");
-            System.out.println("3. Array fuera de rango");
-            System.out.println("4. NullPointerException");
-            System.out.println("5. Múltiples catch");
-            System.out.println("6. Finally");
-            System.out.println("7. Throw");
-            System.out.println("0. Salir");
-            System.out.print("Elige una opción: ");
+            String nombre = sc.nextLine();
 
-            // Leemos la opción usando un método seguro
-            opcion = leerEntero(sc);
+            // Este método puede lanzar:
+            //
+            // NombreVacioException
+            //
+            // Si el nombre es null o está vacío.
+            //
+            validarNombre(nombre);
 
-            // Ejecutamos el caso correspondiente
-            switch (opcion) {
+            // --------------------------------------------------
+            // LECTURA Y VALIDACIÓN DE LA EDAD
+            // --------------------------------------------------
+            //
+            System.out.print("Introduce tu edad: ");
 
-                case 1:
-                    divisionPorCero(sc);
-                    break;
+            int edad = leerEntero(sc);
 
-                case 2:
-                    entradaIncorrecta(sc);
-                    break;
+            // Este método puede lanzar:
+            //
+            // EdadInvalidaException
+            //
+            // Si la edad es negativa o menor de 18.
+            //
+            validarEdad(edad);
 
-                case 3:
-                    errorArray(sc);
-                    break;
+            // --------------------------------------------------
+            // LECTURA DEL SALDO
+            // --------------------------------------------------
+            //
+            System.out.print("Introduce tu saldo: ");
 
-                case 4:
-                    errorNull(sc);
-                    break;
+            double saldo = leerDouble(sc);
 
-                case 5:
-                    multiplesCatch(sc);
-                    break;
+            // --------------------------------------------------
+            // LECTURA DE LA CANTIDAD A RETIRAR
+            // --------------------------------------------------
+            //
+            System.out.print("Cantidad a retirar: ");
 
-                case 6:
-                    ejemploFinally(sc);
-                    break;
+            double cantidad = leerDouble(sc);
 
-                case 7:
-                    ejemploThrow(sc);
-                    break;
+            // --------------------------------------------------
+            // VALIDACIÓN DE LA OPERACIÓN BANCARIA
+            // --------------------------------------------------
+            //
+            // Este método puede lanzar:
+            //
+            // SaldoInsuficienteException
+            //
+            // Si el saldo no es suficiente o la cantidad
+            // es inválida.
+            //
+            retirarDinero(saldo, cantidad);
 
-                case 0:
-                    System.out.println("Fin del programa.");
-                    break;
+            // --------------------------------------------------
+            // SI HEMOS LLEGADO HASTA AQUÍ...
+            // --------------------------------------------------
+            //
+            // Significa que:
+            //
+            // - El nombre es válido.
+            // - La edad es válida.
+            // - El saldo es suficiente.
+            // - No se ha lanzado ninguna excepción.
+            //
+            System.out.println(
+                    "Operación realizada correctamente."
+            );
 
-                default:
-                    System.out.println("Opción no válida.");
-            }
+            // Finalizamos el bucle.
+            correcto = true;
 
-        } while (opcion != 0);
-
-        // Cerramos el Scanner al finalizar
-        sc.close();
-    }
-
-    // ======================================================
-    // MÉTODO PARA LEER ENTEROS DE FORMA SEGURA
-    // ======================================================
-    public static int leerEntero(Scanner sc) {
-
-        while (true) {
-
-            try {
-                // Intentamos leer un entero
-                return sc.nextInt();
-
-            } catch (InputMismatchException e) {
-
-                // Si el usuario introduce letras u otro dato inválido
-                System.out.print("Error. Introduce un número entero: ");
-
-                // Limpiamos el buffer para evitar bucles infinitos
-                sc.nextLine();
-            }
         }
-    }
 
-    // ======================================================
-    // MÉTODO PARA LEER NÚMEROS DECIMALES
-    // ======================================================
-    public static double leerDouble(Scanner sc) {
+        // ==================================================
+        // CAPTURA DE EXCEPCIONES PERSONALIZADAS
+        // ==================================================
 
-        while (true) {
+        catch (NombreVacioException e) {
 
-            try {
-                return sc.nextDouble();
+            // Se ejecuta cuando validarNombre()
+            // detecta un nombre vacío.
+            //
+            // e contiene el objeto excepción lanzado.
+            //
+            System.out.println(
+                    "Error de nombre: " +
+                            e.getMessage()
+            );
 
-            } catch (InputMismatchException e) {
-
-                System.out.print("Error. Introduce un número válido: ");
-
-                // Eliminamos la entrada incorrecta
-                sc.nextLine();
-            }
         }
-    }
 
-    // ======================================================
-    // EJEMPLO 1: DIVISIÓN POR CERO
-    // ======================================================
-    public static void divisionPorCero(Scanner sc) {
+        catch (EdadInvalidaException e) {
 
-        boolean correcto = false;
+            // Se ejecuta cuando validarEdad()
+            // detecta una edad incorrecta.
+            //
+            System.out.println(
+                    "Error de edad: " +
+                            e.getMessage()
+            );
 
-        while (!correcto) {
-
-            try {
-
-                System.out.print("Introduce el dividendo: ");
-                int a = leerEntero(sc);
-
-                System.out.print("Introduce el divisor: ");
-                int b = leerEntero(sc);
-
-                // Puede generar ArithmeticException
-                int resultado = a / b;
-
-                System.out.println("Resultado: " + resultado);
-
-                correcto = true;
-
-            } catch (ArithmeticException e) {
-
-                // Se ejecuta si b vale 0
-                System.out.println("No se puede dividir entre cero.");
-            }
         }
-    }
 
-    // ======================================================
-    // EJEMPLO 2: ENTRADA INCORRECTA
-    // ======================================================
-    public static void entradaIncorrecta(Scanner sc) {
-
-        System.out.print("Introduce tu edad: ");
-
-        // leerEntero ya controla InputMismatchException
-        int edad = leerEntero(sc);
-
-        System.out.println("Edad introducida correctamente: " + edad);
-    }
-
-    // ======================================================
-    // EJEMPLO 3: ARRAY FUERA DE RANGO
-    // ======================================================
-    public static void errorArray(Scanner sc) {
-
-        // Array de tres posiciones (0,1,2)
-        int[] numeros = {10, 20, 30};
-
-        boolean correcto = false;
-
-        while (!correcto) {
-
-            try {
-
-                System.out.println("Array disponible:");
-                System.out.println("0 -> 10");
-                System.out.println("1 -> 20");
-                System.out.println("2 -> 30");
-
-                System.out.print("Introduce una posición: ");
-
-                int posicion = leerEntero(sc);
-
-                // Puede producir ArrayIndexOutOfBoundsException
-                System.out.println("Valor: " + numeros[posicion]);
-
-                correcto = true;
-
-            } catch (ArrayIndexOutOfBoundsException e) {
-
-                System.out.println(
-                        "Posición fuera de rango. Prueba con 0, 1 o 2."
-                );
-            }
-        }
-    }
-
-    // ======================================================
-    // EJEMPLO 4: NULLPOINTEREXCEPTION
-    // ======================================================
-    public static void errorNull(Scanner sc) {
-
-        // Variable inicializada a null
-        String nombre = null;
-
-        boolean correcto = false;
-
-        while (!correcto) {
-
-            try {
-
-                System.out.print("Introduce tu nombre: ");
-
-                // Limpiamos salto pendiente
-                sc.nextLine();
-
-                // Leemos el nombre
-                nombre = sc.nextLine();
-
-                // Si está vacío lo dejamos en null
-                if (nombre.isBlank()) {
-                    nombre = null;
-                }
-
-                // Si nombre es null provocará NullPointerException
-                System.out.println(
-                        "Longitud del nombre: " + nombre.length()
-                );
-
-                correcto = true;
-
-            } catch (NullPointerException e) {
-
-                System.out.println(
-                        "El nombre no puede estar vacío."
-                );
-            }
-        }
-    }
-
-    // ======================================================
-    // EJEMPLO 5: MÚLTIPLES CATCH
-    // ======================================================
-    public static void multiplesCatch(Scanner sc) {
-
-        boolean correcto = false;
-
-        while (!correcto) {
-
-            try {
-
-                System.out.print("Número 1: ");
-                int a = sc.nextInt();
-
-                System.out.print("Número 2: ");
-                int b = sc.nextInt();
-
-                // Puede producir ArithmeticException
-                int resultado = a / b;
-
-                System.out.println("Resultado: " + resultado);
-
-                correcto = true;
-
-            } catch (InputMismatchException e) {
-
-                // Si se introducen letras
-                System.out.println(
-                        "Debes introducir números enteros."
-                );
-
-                // Limpiamos buffer
-                sc.nextLine();
-
-            } catch (ArithmeticException e) {
-
-                // Si se divide entre cero
-                System.out.println(
-                        "No se puede dividir entre cero."
-                );
-            }
-        }
-    }
-
-    // ======================================================
-    // EJEMPLO 6: FINALLY
-    // ======================================================
-    public static void ejemploFinally(Scanner sc) {
-
-        boolean correcto = false;
-
-        while (!correcto) {
-
-            try {
-
-                System.out.print(
-                        "Introduce un número distinto de 0: "
-                );
-
-                int numero = leerEntero(sc);
-
-                int resultado = 10 / numero;
-
-                System.out.println(
-                        "10 / " + numero + " = " + resultado
-                );
-
-                correcto = true;
-
-            } catch (ArithmeticException e) {
-
-                System.out.println(
-                        "Error: el número no puede ser 0."
-                );
-
-            } finally {
-
-                // Este bloque SIEMPRE se ejecuta
-                // haya excepción o no
-                System.out.println(
-                        "Bloque finally ejecutado."
-                );
-            }
-        }
-    }
-
-    // ======================================================
-    // EJEMPLO 7: THROW
-    // ======================================================
-    public static void ejemploThrow(Scanner sc) {
-
-        boolean correcto = false;
-
-        while (!correcto) {
-
-            try {
-
-                System.out.print(
-                        "Introduce una edad positiva: "
-                );
-
-                int edad = leerEntero(sc);
-
-                // Lanzamos manualmente una excepción
-                if (edad < 0) {
-
-                    throw new IllegalArgumentException(
-                            "La edad no puede ser negativa."
-                    );
-                }
-
-                System.out.println(
-                        "Edad válida: " + edad
-                );
-
-                correcto = true;
-
-            } catch (IllegalArgumentException e) {
-
-                // Mostramos el mensaje de la excepción
-                System.out.println(
-                        e.getMessage()
-                );
-            }
+        catch (SaldoInsuficienteException e) {
+
+            // Se ejecuta cuando retirarDinero()
+            // detecta una operación imposible.
+            //
+            System.out.println(
+                    "Error bancario: " +
+                            e.getMessage()
+            );
         }
     }
 }
